@@ -26,6 +26,27 @@
               authority="https://login.microsoftonline.com/6c206ed4-984a-4473-993a-fc0b856b265">
       </mgt-msal-provider>
         <mgt-login ></mgt-login>
+
+        <mgt-person person-query="me" view="twoLines" person-card="hover">
+          <template data-type="person-card">
+            <mgt-person-card inherit-details>
+              <template data-type="additional-details">
+                <h3>Stuffed Animal Friends:</h3>
+                <ul>
+                  <li>Giraffe</li>
+                  <li>lion</li>
+                  <li>Rabbit</li>
+                </ul>
+              </template>
+            </mgt-person-card>
+          </template>
+        </mgt-person>
+        <div style="margin:2em 0 0 1em;font-family:segoe ui;color:#323130;font-size:12px">
+          (Détails)
+        </div>
+
+        <div>Agenda</div>
+
         <mgt-agenda  class="mgt-dark"></mgt-agenda>
         <!-- <mgt-person  class="mgt-dark" person-query="me" show-presence view="twoLines"></mgt-person> -->
         <div class="example">
@@ -35,9 +56,22 @@
           </mgt-person>
         </div>
         
-        <mgt-todo class="mgt-dark"></mgt-todo>
-        <mgt-get resource="/me/messages" version="beta" scopes="mail.read" max-pages="2">
+        <mgt-get resource="/me/lastPasswordChangeDateTime" version="beta" scopes="user.read" >
           <template>
+            <div>Mot de passe changé le {{value}}</div>
+          </template>
+          <template data-type="loading">
+            Chargemen
+          </template>
+          <template data-type="error">
+            {{ this }}
+          </template>
+        </mgt-get>
+
+        <mgt-todo class="mgt-dark"></mgt-todo>
+        <mgt-get resource="/me/messages" version="beta" scopes="mail.read" max-pages="3">
+          <template>
+            <div>{{value.length}}</div>
             <div class="email" data-for="email in value">
               <h4>
                 <mgt-person person-query="{{email.sender.emailAddress.address}}" view="oneline" person-card="hover">
