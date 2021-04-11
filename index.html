@@ -4,103 +4,113 @@
 <head>
   <title>JavaScript Microsoft Graph SPA</title>
   <link rel="icon" href="data:;base64,="> <!-- Suppress favicon error -->
-  <style> 
-    .user { 
-            border-radius: 50%;       
-            border-style: solid; 
-            border-width: 5px; 
-            height: 150px; 
-            width: 150px; 
-          } 
-    </style>
-    <script src="https://unpkg.com/@microsoft/mgt/dist/bundle/mgt-loader.js"></script>
-  </head>
-  
-  <body>
-    <main id="main-container" role="main" class="container">
-      <!-- live  
-      <mgt-msal-provider client-id="141b84eb-947e-444b-ad7c-1ab68b2428"></mgt-msal-provider>  -->  
-      <!-- casa <mgt-msal-provider client-id="cb9789d8-4496-4b9d-aaec-6a0eabf328"></mgt-msal-provider>     -->
-      <mgt-msal-provider 
-              client-id="cb9789d8-4496-4b9d-aaec-6a0eabf328e"
-              authority="https://login.microsoftonline.com/6c206ed4-984a-4473-993a-fc0b856b265">
-      </mgt-msal-provider>
-        <mgt-login ></mgt-login>
+  <style>
+    .user {
+      border-radius: 50%;
+      border-style: solid;
+      border-width: 5px;
+      height: 150px;
+      width: 150px;
+    }
+  </style>
+  <script src="https://unpkg.com/@microsoft/mgt/dist/bundle/mgt-loader.js"></script>
+</head>
 
-        <mgt-person person-query="me" view="twoLines" person-card="hover">
-          <template data-type="person-card">
-            <mgt-person-card inherit-details>
-              <template data-type="additional-details">
-                <h3>Stuffed Animal Friends:</h3>
-                <ul>
-                  <li>Giraffe</li>
-                  <li>lion</li>
-                  <li>Rabbit</li>
-                </ul>
-              </template>
-            </mgt-person-card>
+<body>
+  <main id="main-container" role="main" class="container">
+    <!-- live  
+      <mgt-msal-provider client-id="141b84eb-947e-444b-ad7c-1ab68b24287"></mgt-msal-provider>  -->
+    <!-- casa <mgt-msal-provider client-id="cb9789d8-4496-4b9d-aaec-6a0eabf328e"></mgt-msal-provider>     -->
+    <mgt-msal-provider client-id="cb9789d8-4496-4b9d-aaec-6a0eabf328e"
+      authority="https://login.microsoftonline.com/6c206ed4-984a-4473-993a-fc0b856b265">
+    </mgt-msal-provider>
+    <mgt-login></mgt-login>
+
+    <mgt-person show-presence person-query="me" view="twoLines" person-card="hover">
+      <template data-type="person-card">
+        <mgt-person-card inherit-details>
+          <template data-type="additional-details">
+            <h3>Liste:</h3>
+            <ul>
+              <li>élément</li>
+            </ul>
           </template>
-        </mgt-person>
-        <div style="margin:2em 0 0 1em;font-family:segoe ui;color:#323130;font-size:12px">
-          (Détails)
+        </mgt-person-card>
+      </template>
+    </mgt-person>
+    <div style="margin:2em 0 0 1em;font-family:segoe ui;color:#323130;font-size:12px">
+      (Détails)
+    </div>
+
+    <div>Agenda</div>
+
+    <mgt-agenda class="mgt-dark"></mgt-agenda>
+    
+    <mgt-get resource="/me/lastPasswordChangeDateTime" version="beta" scopes="user.read">
+      <template>
+        <div>Mot de passe changé le {{value}}</div>
+      </template>
+      <template data-type="loading">
+        Chargement
+      </template>
+      <template data-type="error">
+        {{ this }}
+      </template>
+    </mgt-get>
+
+    <!-- https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages?$filter=isRead ne true&$count=true -->
+    <mgt-get resource="/me/mailFolders/Inbox/messages?$filter=isRead ne true&$count=true" version="beta" scopes="user.read">
+      <template>
+        <div>Non lu </div>
+        <div data-if="value.length">
+          <div>{{value.length}} emails non lus</div>
         </div>
-
-        <div>Agenda</div>
-
-        <mgt-agenda  class="mgt-dark"></mgt-agenda>
-        <!-- <mgt-person  class="mgt-dark" person-query="me" show-presence view="twoLines"></mgt-person> -->
-        <div class="example">
-          <div>Mon profil</div>
-          <!--add fallback property by comma separating-->
-          <mgt-person person-query="me" line1-property="givenName,displayName" line2-property="jobTitle,mail,id,lastPasswordChangeDateTime" view="twoLines">
-          </mgt-person>
+        <div data-else>
+          {{ email.subject }}
         </div>
-        
-        <mgt-get resource="/me/lastPasswordChangeDateTime" version="beta" scopes="user.read" >
-          <template>
-            <div>Mot de passe changé le {{value}}</div>
-          </template>
-          <template data-type="loading">
-            Chargemen
-          </template>
-          <template data-type="error">
-            {{ this }}
-          </template>
-        </mgt-get>
+      </template>
+      <template data-type="loading">
+        Chargement
+      </template>
+      <template data-type="error">
+        {{ this }}
+      </template>
+    </mgt-get>
+    
+    
+    <mgt-todo class="mgt-dark"></mgt-todo>
+    <mgt-get resource="/me/messages" version="beta"  scopes="mail.read" max-pages="3">
+      <template>
+        <div>{{value.length}} emails dans la boite</div>
+        <div class="email" data-for="email in value">
+          <h4>
+            <mgt-person person-query="{{email.sender.emailAddress.address}}" view="oneline" person-card="hover">
+            </mgt-person>
+          </h4>
+          <h3>{{ email.subject }}</h3>
+          <div data-if="email.bodyPreview" class="preview" innerHtml>{{email.bodyPreview}}</div>
+          <div data-else class="preview">
+            Vide
+          </div>
+        </div>
+      </template>
+      <template data-type="loading">
+        Chargement
+      </template>
+      <template data-type="error">
+        {{ this }}
+      </template>
+    </mgt-get>
 
-        <mgt-todo class="mgt-dark"></mgt-todo>
-        <mgt-get resource="/me/messages" version="beta" scopes="mail.read" max-pages="3">
-          <template>
-            <div>{{value.length}}</div>
-            <div class="email" data-for="email in value">
-              <h4>
-                <mgt-person person-query="{{email.sender.emailAddress.address}}" view="oneline" person-card="hover">
-                </mgt-person>
-              </h4>
-              <h3>{{ email.subject }}</h3>
-              <div data-if="email.bodyPreview" class="preview" innerHtml>{{email.bodyPreview}}</div>
-              <div data-else class="preview">
-                Vide
-              </div>
-            </div>
-          </template>
-          <template data-type="loading">
-            Chargement
-          </template>
-          <template data-type="error">
-            {{ this }}
-          </template>
-        </mgt-get>
-
-         <div id="content" style="display: none;">
-      <h4>Welcome <span id="userName"></span></h4>    
+    <div id="content" style="display: none;">
+      <h4>Welcome <span id="userName"></span></h4>
     </div>
     <a id="signin" onclick="displayUI(); return false;" href="#">
       <img src="./images/ms-symbollockup_signin_light.png" alt="Sign in with Microsoft" />
     </a>
     <div>
-      <button id="showProfilePhoto" style=”display:none” onclick="displayProfilePhoto();">Show profile picture</button> 
-    </div> 
+      <button id="showProfilePhoto" style=”display:none” onclick="displayProfilePhoto();">Show profile picture</button>
+    </div>
     <img id="userPhoto" class="user" alt="User photo" style="display: none;" />
   </main>
   <script src="https://alcdn.msauth.net/browser/2.1.0/js/msal-browser.min.js"
@@ -111,4 +121,5 @@
   <script src="graph.js"></script>
   <script src="ui.js"></script>
 </body>
+
 </html>
