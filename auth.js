@@ -1,9 +1,15 @@
 //MSAL configuration
 const msalConfig = {
     auth: {
-        clientId: '<your client ID here>',
-        // comment out if you use a multi-tenant AAD app
-        authority: 'https://login.microsoftonline.com/<your directory ID here>',
+        // live reactspa         
+        //clientId: '141b84eb-947e-444b-ad7c-1ab68b24287',
+        // graphsingletenant 
+        //clientId: 'b6c0b527-b06f-4518-be8d-db7c546f73c',
+        // casa
+        clientId: 'cb9789d8-4496-4b9d-aaec-6a0eabf328e',
+        // comment out if you use a multi-tenant AAD app 
+        // https://login.microsoftonline.com/<your directory ID here>
+        authority: 'https://login.microsoftonline.com/6c206ed4-984a-4473-993a-fc0b856b265',
         redirectUri: 'http://localhost:8080'
     }
 };

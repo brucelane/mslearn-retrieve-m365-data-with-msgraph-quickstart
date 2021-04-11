@@ -12,7 +12,24 @@ async function getUser() {
     ensureScope('user.read');
     return await graphClient
         .api('/me')
-        .select('id,displayName')
+        .select('id,displayName,lastPasswordChangeDateTime')
         .get();
 }
-
+async function getUserPhoto() {
+    ensureScope('user.readbasic.all'); 
+     return await graphClient  
+         .api('/me/photo/$value')  
+         .get(); 
+ } 
+ async function getPwdDate() {
+    ensureScope('user.readbasic.all'); 
+     return await graphClient  
+         .api('/me/$lastPasswordChangeDateTime')  
+         .get(); 
+ }
+ async function getFiles() {
+    ensureScope('files.read'); 
+     return await graphClient  
+         .api('/me/drive/root/children')  
+         .get(); 
+ }  

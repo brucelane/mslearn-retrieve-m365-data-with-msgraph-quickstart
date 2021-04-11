@@ -4,16 +4,70 @@
 <head>
   <title>JavaScript Microsoft Graph SPA</title>
   <link rel="icon" href="data:;base64,="> <!-- Suppress favicon error -->
-</head>
+  <style> 
+    .user { 
+            border-radius: 50%;       
+            border-style: solid; 
+            border-width: 5px; 
+            height: 150px; 
+            width: 150px; 
+          } 
+    </style>
+    <script src="https://unpkg.com/@microsoft/mgt/dist/bundle/mgt-loader.js"></script>
+  </head>
+  
+  <body>
+    <main id="main-container" role="main" class="container">
+      <!-- live  
+      <mgt-msal-provider client-id="141b84eb-947e-444b-ad7c-1ab68b2428"></mgt-msal-provider>  -->  
+      <!-- casa <mgt-msal-provider client-id="cb9789d8-4496-4b9d-aaec-6a0eabf328"></mgt-msal-provider>     -->
+      <mgt-msal-provider 
+              client-id="cb9789d8-4496-4b9d-aaec-6a0eabf328e"
+              authority="https://login.microsoftonline.com/6c206ed4-984a-4473-993a-fc0b856b265">
+      </mgt-msal-provider>
+        <mgt-login ></mgt-login>
+        <mgt-agenda  class="mgt-dark"></mgt-agenda>
+        <!-- <mgt-person  class="mgt-dark" person-query="me" show-presence view="twoLines"></mgt-person> -->
+        <div class="example">
+          <div>Mon profil</div>
+          <!--add fallback property by comma separating-->
+          <mgt-person person-query="me" line1-property="givenName,displayName" line2-property="jobTitle,mail,id,lastPasswordChangeDateTime" view="twoLines">
+          </mgt-person>
+        </div>
+        
+        <mgt-todo class="mgt-dark"></mgt-todo>
+        <mgt-get resource="/me/messages" version="beta" scopes="mail.read" max-pages="2">
+          <template>
+            <div class="email" data-for="email in value">
+              <h4>
+                <mgt-person person-query="{{email.sender.emailAddress.address}}" view="oneline" person-card="hover">
+                </mgt-person>
+              </h4>
+              <h3>{{ email.subject }}</h3>
+              <div data-if="email.bodyPreview" class="preview" innerHtml>{{email.bodyPreview}}</div>
+              <div data-else class="preview">
+                Vide
+              </div>
+            </div>
+          </template>
+          <template data-type="loading">
+            Chargement
+          </template>
+          <template data-type="error">
+            {{ this }}
+          </template>
+        </mgt-get>
 
-<body>
-  <main id="main-container" role="main" class="container">
-    <div id="content" style="display: none;">
+         <div id="content" style="display: none;">
       <h4>Welcome <span id="userName"></span></h4>    
     </div>
     <a id="signin" onclick="displayUI(); return false;" href="#">
       <img src="./images/ms-symbollockup_signin_light.png" alt="Sign in with Microsoft" />
     </a>
+    <div>
+      <button id="showProfilePhoto" style=”display:none” onclick="displayProfilePhoto();">Show profile picture</button> 
+    </div> 
+    <img id="userPhoto" class="user" alt="User photo" style="display: none;" />
   </main>
   <script src="https://alcdn.msauth.net/browser/2.1.0/js/msal-browser.min.js"
     integrity="sha384-EmYPwkfj+VVmL1brMS1h6jUztl4QMS8Qq8xlZNgIT/luzg7MAzDVrRa2JxbNmk/e"
